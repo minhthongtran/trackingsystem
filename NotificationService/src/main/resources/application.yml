@@ -1,0 +1,6 @@
+application:
+  url: http://localhost:9000
+  applicationId: TrackingSystem
+  bootstrapAddress: http://localhost:9092
+  streamInput: stream-input
+  streamOutput: stream-output

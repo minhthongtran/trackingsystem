@@ -1,0 +1,17 @@
+server:
+  port: 9001
+
+
+application:
+  username: LongDriver
+  lng: 200.0
+  lat: 300.0
+  streamInput: stream-input
+  streamOutput: stream-output
+  bootstrapAddress: http://localhost:9092
+  applicationId: TrackingSystem
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/DriverService
