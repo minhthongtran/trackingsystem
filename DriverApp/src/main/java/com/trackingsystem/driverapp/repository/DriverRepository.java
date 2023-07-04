@@ -17,6 +17,6 @@ public interface DriverRepository extends MongoRepository<Driver, String> {
 
 
     @Query("{'username': :#{#username}, 'orders.orderID': :#{#orderID} }, {'orders.$': 1}")
-    Optional<Order> findOrderByID(@Param("username") String username, @Param("orderID") String orderID);
+    Optional<Driver> findOrderByID(@Param("username") String username, @Param("orderID") String orderID);
 
 }

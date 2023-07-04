@@ -11,6 +11,5 @@ public class DriverRequest {
 
     private String username;
     private CoordinateDTO coordinateDTO;
-
     private String orderID;
 }
