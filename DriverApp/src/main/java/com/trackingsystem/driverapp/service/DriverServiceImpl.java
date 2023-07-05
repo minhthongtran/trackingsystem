@@ -1,11 +1,10 @@
 package com.trackingsystem.driverapp.service;
 
+import com.trackingsystem.driverapp.domain.Coordinate;
 import com.trackingsystem.driverapp.domain.Driver;
+import com.trackingsystem.driverapp.domain.HistoryCoordinate;
 import com.trackingsystem.driverapp.domain.Order;
-import com.trackingsystem.driverapp.dto.DriverDTO;
-import com.trackingsystem.driverapp.dto.DriverRequest;
-import com.trackingsystem.driverapp.dto.HistoryCoordinateDTO;
-import com.trackingsystem.driverapp.dto.OrderDTO;
+import com.trackingsystem.driverapp.dto.*;
 import com.trackingsystem.driverapp.kafka.KafkaProducer;
 import com.trackingsystem.driverapp.repository.DriverRepository;
 import org.modelmapper.ModelMapper;
@@ -14,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,16 +37,10 @@ public class DriverServiceImpl implements DriverService {
     }
 
     @Override
-    public DriverDTO updateHistoryCoordinate(String username, OrderDTO orderDTO) throws AccountNotFoundException {
+    public DriverDTO updateOrderHistory(String username, OrderDTO orderDTO) throws AccountNotFoundException {
         Driver driver = driverRepository.findByUsername(username).orElseThrow(AccountNotFoundException::new);
         Order order = modelMapper.map(orderDTO, Order.class);
-        List<HistoryCoordinateDTO> historyCoordinateDTOs = orderDTO.getHistoryCoordinateDTO();
-        List<Order> orders = driver.getOrders();
-        for (Order o : orders) {
-            o.getHistoryCoordinate().add()
-        }
-
-
+        driver.getOrders().add(order);
         driverRepository.save(driver);
         DriverDTO driverDTO = modelMapper.map(driver, DriverDTO.class);
         return driverDTO;
@@ -60,10 +55,26 @@ public class DriverServiceImpl implements DriverService {
         OrderDTO orderDTO = new OrderDTO();
         for (Order ord : orders) {
             if (ord.getOrderID() != null && ord.getOrderID().equals(orderID))
+
                 orderDTO = modelMapper.map(ord, OrderDTO.class);
-            ;
+            orderDTO.setHistoryCoordinateDTO(mapToDTO(ord.getHistoryCoordinate()));
+            break;
         }
         return orderDTO;
+    }
+
+    private List<HistoryCoordinateDTO> mapToDTO(List<HistoryCoordinate> historyCoordinates) {
+        List<HistoryCoordinateDTO> historyCoordinateDTOS = new ArrayList<>();
+        for (HistoryCoordinate history : historyCoordinates) {
+
+            historyCoordinateDTOS.add(modelMapper.map(history, HistoryCoordinateDTO.class));
+        }
+        return historyCoordinateDTOS;
+    }
+
+    private CoordinateDTO mapToDTO(Coordinate coordinate){
+        CoordinateDTO coordinateDTO = modelMapper.map(coordinate, CoordinateDTO.class);
+                return coordinateDTO;
     }
 
     @Override
@@ -71,14 +82,28 @@ public class DriverServiceImpl implements DriverService {
         try {
             String orderID = driverRequest.getOrderID();
             if (!orderID.equals(null)) {
-                OrderDTO orderDTO = getOrderByID(username, orderID);
-                updateHistoryCoordinate(username, orderDTO);
+//                OrderDTO orderDTO = getOrderByID(username, orderID);
+                updateHistoryCoordinate(username, driverRequest);
             }
             kafkaProducer.sendMessage(driverRequest);
             return driverRequest;
         } catch (AccountNotFoundException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public DriverDTO updateHistoryCoordinate(String username, DriverRequest driverRequest) throws AccountNotFoundException {
+        Driver driver = driverRepository.findByUsername(username).orElseThrow(AccountNotFoundException::new);
+        String orderID = driverRequest.getOrderID();
+        OrderDTO orderDTO = getOrderByID(username, orderID);
+
+        List<HistoryCoordinateDTO> historyCoordinateDTOs = orderDTO.getHistoryCoordinateDTO();
+        historyCoordinateDTOs.add(new HistoryCoordinateDTO(driverRequest.getCoordinateDTO(), LocalDateTime.now()));
+        orderDTO.setHistoryCoordinateDTO(historyCoordinateDTOs);
+        DriverDTO driverDTO = modelMapper.map(driver, DriverDTO.class);
+        driverRepository.save(driver);
+        return driverDTO;
     }
 
 

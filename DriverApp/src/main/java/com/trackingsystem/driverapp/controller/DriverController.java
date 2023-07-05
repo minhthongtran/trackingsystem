@@ -33,7 +33,7 @@ public class DriverController {
     }
 
     @PutMapping("/{username}")
-    public ResponseEntity<?> updateCoordinate(@PathVariable String username, @RequestBody OrderDTO orderDTO) throws AccountNotFoundException {
+    public ResponseEntity<?> addOrder(@PathVariable String username, @RequestBody OrderDTO orderDTO) throws AccountNotFoundException {
         return ResponseEntity.ok(driverService.updateOrderHistory(username, orderDTO));
     }
 }

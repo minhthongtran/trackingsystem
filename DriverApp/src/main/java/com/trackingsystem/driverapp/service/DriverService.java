@@ -11,11 +11,13 @@ public interface DriverService {
 
      Driver save(DriverDTO driverDTO);
 
-     DriverDTO updateHistoryCoordinate(String username, OrderDTO orderDTO) throws AccountNotFoundException;
-
+     DriverDTO updateOrderHistory(String username, OrderDTO orderDTO) throws AccountNotFoundException;
      OrderDTO getOrderByID(String username, String orderID) throws AccountNotFoundException;
 
      DriverRequest sendCoordinate(String username, DriverRequest driverRequest);
+
+
+     DriverDTO updateHistoryCoordinate(String username, DriverRequest driverRequest) throws AccountNotFoundException;
 
 
 
