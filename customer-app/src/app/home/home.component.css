@@ -1,0 +1,32 @@
+.container {
+  width: 100%;
+  height: 100%;
+}
+
+.match-parent {
+  width: 100%;
+  height: 100%;
+}
+
+.map-container {
+  width:750px;
+  height: 550px;
+  margin: 0 auto;
+  padding-top: 2em;
+  border: 1px solid white;
+  border-radius: 5px;
+}
+
+@media only screen and (max-width: 500px) {
+  .map-container {
+    width:370px;
+    height: 490px;
+    margin: 0 auto;
+    padding-top: 2em;
+    border: 1px solid white;
+    border-radius: 5px;
+  }
+}
+.mapboxgl-ctrl-bottom-left {
+  height: 50px;
+}
